@@ -13,7 +13,7 @@ import os
 BATCH_SIZE = ctc_training.BATCH_SIZE
 IMG_HEIGHT = ctc_training.IMG_HEIGHT
 
-def test(corpus_path, set_path, test_path, train_path, voc_path, voc_type, model_path, verbose=False, log_file=None):
+def test(corpus_path, test_path, train_path, voc_path, voc_type, model_path, verbose=False, log_file=None):
     if verbose:
         if not os.path.exists(log_file):
             open(log_file,'w').close()
@@ -31,7 +31,7 @@ def test(corpus_path, set_path, test_path, train_path, voc_path, voc_type, model
     
     logging.info('---Testing model ' + model_path + '---')
     
-    primus = CTC_PriMuS(corpus_path, set_path, test_path, train_path, voc_path, voc_type)
+    primus = CTC_PriMuS(corpus_path, test_path, train_path, voc_path, voc_type)
     sess, inputs, seq_len, decoded, loss, rnn_keep_prob, width_reduction, height, int2word = ctc_model.load_ctc_crnn(model_path, voc_path)
     params = ctc_model.default_model_params(IMG_HEIGHT,primus.vocabulary_size,batch_size=BATCH_SIZE)
     
@@ -56,11 +56,10 @@ if __name__ == '__main__':
     parser.add_argument('-voc_type', dest='voc_type', required=False, default=configured_defaults['voc_type'], choices=['semantic','agnostic'], help='Vocabulary type.')
     parser.add_argument('-verbose', dest='verbose', action="store_true", default=False, required=False)
     parser.add_argument('-log-file', dest='log_file', type=str, required=False, default=configured_defaults['test_results_path'], help='Path to the log file.')
-    parser.add_argument('-corpus-set', dest='corpus_set', type=str, required=False, default=configured_defaults['set_path'], help='Path to the corpus set file.')
     parser.add_argument('-test-set', dest='test_set', type=str, required=False, default=configured_defaults['test_set_path'], help='Path to the test set file.')
     parser.add_argument('-train-set' , dest='train_set', type=str, required=False, default=configured_defaults['train_set_path'], help='Path to the train set file.')
     parser.add_argument("-save-predictions", dest='save_predictions', action="store_true", default=False, required=False, help='Save predictions to a file.')
     args = parser.parse_args()
 
-    test(args.corpus, args.corpus_set, args.test_set, args.train_set, args.voc, args.voc_type, args.save_model, args.verbose, args.log_file)
+    test(args.corpus, args.test_set, args.train_set, args.voc, args.voc_type, args.save_model, args.verbose, args.log_file)
 

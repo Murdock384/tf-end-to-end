@@ -91,7 +91,7 @@ def train(corpus_path, set_path, test_set, train_set, voc_path, voc_type, model_
     logging.info("Provided arguments: " + str(locals()))
 
     # Load primus
-    primus = CTC_PriMuS(corpus_path,set_path, test_set, train_set, voc_path, voc_type, val_split = 0.1, distortion_ratio = weave_distortions_ratio, use_otfa=use_otfa)
+    primus = CTC_PriMuS(corpus_path, test_set, train_set, set_path, voc_path, voc_type, val_split = 0.1, distortion_ratio = weave_distortions_ratio, use_otfa=use_otfa)
 
     if os.path.exists(model_path) and model_path.endswith('.meta'):
         logging.info('Restoring model from ' + model_path)

@@ -7,17 +7,14 @@ import random
 import os
 from tensorflow import keras
 
-class CTC_PriMuS(keras.utils.PyDataset):
+class CTC_PriMuS():
     gt_element_separator = '-'
     PAD_COLUMN = 0
     validation_dict = None
 
     FOLD_COEFFICIENT = 1 / 15000
 
-    def __init__(self, corpus_dirpath, test_filepath, train_filepath, dictionary_path, voc_type, val_split = 0.0, distortion_ratio = 0.0, use_otfa=False):
-        # Call the parent class constructor
-        super().__init__(corpus_dirpath)
-        
+    def __init__(self, corpus_dirpath, test_filepath, train_filepath, dictionary_path, voc_type, val_split = 0.0, distortion_ratio = 0.0, use_otfa=False):        
         for path in [dictionary_path]: assert os.path.exists(path), 'File not found: ' + path
         
         self.voc_type = voc_type

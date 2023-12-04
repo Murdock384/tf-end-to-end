@@ -2,34 +2,34 @@
 {
     "type": "distortion",
     "distrobution": "gaussian",
-    "variance": "0.0"
+    "variance": "0.001"
 },
 {
     "type": "rotation",
     "distrobution": "gaussian",
-    "variance": "0.0"    
+    "variance": "12.0"    
 },
 {
     "type": "strech",
     "distrobution": "gaussian",
-    "variance": "0.0",
+    "variance": "0.2",
     "axis": "1"
 },
 {
     "type": "strech",
     "distrobution": "gaussian",
-    "variance": "0.0",
+    "variance": "0.2",
     "axis": "0"
 },
 {
     "type": "scale",
     "distrobution": "gaussian",
-    "variance": "0.0"
+    "variance": "0.3"
 },
 {
     "type": "scale",
     "distrobution": "gaussian",
-    "variance": "0.0"
+    "variance": "0.3"
 },
 {
     "type": "translate",
@@ -40,13 +40,13 @@
 {
     "type": "translate",
     "distrobution": "gaussian",
-    "variance": "0.0",
+    "variance": "0.3",
     "axis": "0"
 },
 {
     "type": "blur",
     "distrobution": "gaussian",
-    "variance": "0.0"
+    "variance": "0.1"
 },
 {
     "type": "contrast_shift",
@@ -61,7 +61,7 @@
 {
     "type": "sharpen",
     "distrobution": "gaussian",
-    "variance": "0.0"
+    "variance": "0.25"
 },
 {
     "type": "salt_pepper",

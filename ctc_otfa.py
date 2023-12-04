@@ -106,11 +106,7 @@ class augmentation(ABC):
     def __init__(self, type, distrobution, variance):
         self.type = str(type)
         
-        if distrobution == 'normal' or distrobution == 'gaussian':
-            self.distrobution = np.random.normal
-        elif distrobution == 'uniform':
-            self.distrobution = np.random.uniform
-        elif isinstance(distrobution, np.random.Generator):
+        if isinstance(distrobution, np.random.Generator):
             self.distrobution = distrobution
         else:
             raise Exception('Invalid distrobution type \"' + str(distrobution) + '\"')
