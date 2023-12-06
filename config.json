@@ -4,7 +4,7 @@
     "test_set_path": "P:/project/models/ofta-v2/test.txt",
     "train_set_path": "P:/project/models/ofta-v2/train.txt",
     "checkpoint_path": "P:/project/models/kv1-checkpoint.keras",
-    "model_path": "P:/project/models/ofta-v2/otfa-v2-0-0.meta",
+    "model_path": "P:/project/models/ofta-v2/otfa-v2-10-10.meta",
     "log_path": "P:/project/logs/kv1.txt",
     "corpus_path":"P:/project/datasets/CameraPrIMuS/Corpus",
     "voc_path": "P:/project/tf-end-to-end/Data/vocabulary_semantic.txt",

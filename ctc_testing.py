@@ -4,6 +4,7 @@ import ctc_training
 from primus import CTC_PriMuS
 
 import tensorflow as tf
+import ctc_predict
 import config
 import json
 import argparse
@@ -32,15 +33,20 @@ def test(corpus_path, test_path, train_path, voc_path, voc_type, model_path, ver
     logging.info('---Testing model ' + model_path + '---')
     
     primus = CTC_PriMuS(corpus_path, test_path, train_path, voc_path, voc_type)
-    sess, inputs, seq_len, decoded, loss, rnn_keep_prob, width_reduction, height, int2word = ctc_model.load_ctc_crnn(model_path, voc_path)
+    sess, input, seq_len, decoded, loss, rnn_keep_prob, width_reduction, height, int2word = ctc_model.load_ctc_crnn(model_path, voc_path)
     params = ctc_model.default_model_params(IMG_HEIGHT,primus.vocabulary_size,batch_size=BATCH_SIZE)
-    
+    # # test image 
+    # impath = "P:/project/datasets/CameraPrIMuS/Corpus/230006613-1_2_2/230006613-1_2_2.png"
+    # semantic_string = ctc_predict.predict(impath, model_path, voc_path)
+    # print(semantic_string)
+
     # Set up TF session and initialize variables
     sess = tf.compat.v1.InteractiveSession()
     sess.run(tf.compat.v1.global_variables_initializer())
 
-    val_ed, val_len, val_count = ctc_training.validate(primus, params, sess, inputs, seq_len, rnn_keep_prob, decoded)
+    val_ed, val_len, val_count = ctc_training.validate(primus, params, sess, input, seq_len, rnn_keep_prob, decoded)
 
+    logging.info('Model ' + model_path + ' tested on ' + test_path + ' with vocabulary ' + voc_path + ' and vocabulary type ' + voc_type + '.')
     logging.info('Validation set: ' + str(val_ed) + ' errors in ' + str(val_len) + ' characters (' + str(val_count) + ' samples)')
     logging.info('Validation set: ' + str(val_ed/val_len) + ' CER')
     logging.info(str(1. * val_ed / val_count) + ' (' + str(100. * val_ed / val_len) + ' SER) from ' + str(val_count) + ' samples.')

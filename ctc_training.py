@@ -8,6 +8,7 @@ import os
 from primus import CTC_PriMuS
 import ctc_utils
 import ctc_model
+import ctc_predict
 import config
 
 SAVE_PERIOD = 1
@@ -17,7 +18,7 @@ MAX_EPOCHS = 100
 DROPOUT = 0.5
 
 # Calculate the sample error rate (SER) of the model
-def validate(primus, params, sess, inputs, seq_len, rnn_keep_prob, decoded):
+def validate(primus, params, sess, input, seq_len, rnn_keep_prob, decoded):
     validation_batch, validation_size = primus.getValidation(params)
     
     val_idx = 0
@@ -28,7 +29,7 @@ def validate(primus, params, sess, inputs, seq_len, rnn_keep_prob, decoded):
         
     while val_idx < validation_size:
         mini_batch_feed_dict = {
-            inputs: validation_batch['inputs'][val_idx:val_idx+params['batch_size']],
+            input: validation_batch['inputs'][val_idx:val_idx+params['batch_size']],
             seq_len: validation_batch['seq_lengths'][val_idx:val_idx+params['batch_size']],
             rnn_keep_prob: 1.0            
         }
@@ -43,7 +44,6 @@ def validate(primus, params, sess, inputs, seq_len, rnn_keep_prob, decoded):
             prediction_str = ''
             for w in str_predictions[i]:
                 prediction_str += (primus.int2word[w]) +'\t'
-            prediction_str = prediction_str[:-1]
 
             actual_str = ''
             for w in validation_batch['targets'][val_idx+i]:
