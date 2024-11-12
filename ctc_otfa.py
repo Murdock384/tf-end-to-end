@@ -5,6 +5,7 @@ import cv2
 import ctc_utils
 import os 
 import json
+from typing import Union
 from abc import ABC, abstractmethod
 import ctc_otfa
 import tensorflow as tf
@@ -103,17 +104,30 @@ if __name__ == '__main__':
 
 
 class augmentation(ABC):
-    def __init__(self, type, distribution, variance):
-        self.type = str(type)
-        
-        if isinstance(distribution, np.random.Generator):
-            self.distribution = distribution
+    def __init__(self, type:str, distribution: Union[str, np.random.Generator], variance:float):
+        self.type: str = str(type)
+        self.variance: float = float(variance)
+
+        if isinstance(distribution, str):
+            self.distribution: np.random.Generator = self.str_to_generator(distribution=distribution) #convert to np.random.Generator
         else:
-            raise Exception('Invalid distribution type \"' + str(distribution) + '\"')
-        self.variance = float(variance)
+            self.distribution: np.random.Generator = distribution
 
     def __str__(self) -> str:
         return 'AUGMENTATION: ' +self.type + ', ' + str(self.variance) + ', ' + str(self.distribution)
+
+    def str_to_generator(self, distribution: str) -> np.random.Generator:
+        distribution.lower()
+        if distribution == "gaussian" or distribution == "normal":
+            return np.random.normal
+        elif distribution == "uniform":
+            return np.random.uniform
+        elif distribution == "random":
+            return np.random.random
+        elif distribution == "binomial":
+            return np.random.binomial
+        else:
+            raise Exception('Invalid distribution type \"' + str(distribution) + '\"')
 
     # This function should take a tensor and return a tensor
     @abstractmethod
