@@ -47,27 +47,27 @@ def read_augmentations(augmentations_path=AUGS_PATH):
         # use the 'type' field literally to create the augmentation object
         for aug in data:
             if aug['type'] == 'rotation':
-                augmentations.append(ctc_otfa.rotation(aug['variance'],aug['distrobution']))
+                augmentations.append(ctc_otfa.rotation(aug['variance'],aug['distribution']))
             elif aug['type'] == 'strech':
-                augmentations.append(ctc_otfa.strech(aug['variance'], aug['axis'],aug['distrobution']))
+                augmentations.append(ctc_otfa.strech(aug['variance'], aug['axis'],aug['distribution']))
             elif aug['type'] == 'scale':
-                augmentations.append(ctc_otfa.scale(aug['variance'],aug['distrobution']))
+                augmentations.append(ctc_otfa.scale(aug['variance'],aug['distribution']))
             elif aug['type'] == 'translate':
-                augmentations.append(ctc_otfa.translate(aug['variance'], aug['axis'],aug['distrobution']))
+                augmentations.append(ctc_otfa.translate(aug['variance'], aug['axis'],aug['distribution']))
             elif aug['type'] == 'blur':
-                augmentations.append(ctc_otfa.blur(aug['variance'],aug['distrobution']))
+                augmentations.append(ctc_otfa.blur(aug['variance'],aug['distribution']))
             elif aug['type'] == 'contrast_shift':
-                augmentations.append(ctc_otfa.contrast_shift(aug['variance'],aug['distrobution']))
+                augmentations.append(ctc_otfa.contrast_shift(aug['variance'],aug['distribution']))
             elif aug['type'] == 'brightness_shift':
-                augmentations.append(ctc_otfa.brightness_shift(aug['variance'],aug['distrobution']))
+                augmentations.append(ctc_otfa.brightness_shift(aug['variance'],aug['distribution']))
             elif aug['type'] == 'sharpen':
-                augmentations.append(ctc_otfa.sharpen(aug['variance'],aug['distrobution']))
+                augmentations.append(ctc_otfa.sharpen(aug['variance'],aug['distribution']))
             elif aug['type'] == 'salt_pepper':
-                augmentations.append(ctc_otfa.salt_pepper(aug['variance'],aug['distrobution']))
+                augmentations.append(ctc_otfa.salt_pepper(aug['variance'],aug['distribution']))
             elif aug['type'] == 'radial_distortion':
-                augmentations.append(ctc_otfa.radial_distortion(aug['variance'],aug['distrobution']))
+                augmentations.append(ctc_otfa.radial_distortion(aug['variance'],aug['distribution']))
             elif aug['type'] == 'distortion':
-                augmentations.append(ctc_otfa.distort(aug['variance'],aug['distrobution']))
+                augmentations.append(ctc_otfa.distort(aug['variance'],aug['distribution']))
             else:
                 raise Exception('Invalid augmentation type \"' + aug['type'] + '\"')
             
@@ -103,29 +103,29 @@ if __name__ == '__main__':
 
 
 class augmentation(ABC):
-    def __init__(self, type, distrobution, variance):
+    def __init__(self, type, distribution, variance):
         self.type = str(type)
         
-        if isinstance(distrobution, np.random.Generator):
-            self.distrobution = distrobution
+        if isinstance(distribution, np.random.Generator):
+            self.distribution = distribution
         else:
-            raise Exception('Invalid distrobution type \"' + str(distrobution) + '\"')
+            raise Exception('Invalid distribution type \"' + str(distribution) + '\"')
         self.variance = float(variance)
 
     def __str__(self) -> str:
-        return 'AUGMENTATION: ' +self.type + ', ' + str(self.variance) + ', ' + str(self.distrobution)
+        return 'AUGMENTATION: ' +self.type + ', ' + str(self.variance) + ', ' + str(self.distribution)
 
     # This function should take a tensor and return a tensor
     @abstractmethod
-    def augment():
+    def augment(self):
         pass
 
 class rotation(augmentation):
-    def __init__(self, variance, distrobution = np.random.normal, min=0.0):
-        super().__init__('rotation', distrobution, variance)
+    def __init__(self, variance, distribution = np.random.normal, min=0.0):
+        super().__init__('rotation', distribution, variance)
 
     def augment(self, image):
-        angle = self.distrobution(0, self.variance)
+        angle = self.distribution(0, self.variance)
         angle = np.clip(angle, ROT_ANGLE_MIN, ROT_ANGLE_MAX)
         angle = angle + 1
         
@@ -134,86 +134,86 @@ class rotation(augmentation):
     
         pass 
 class strech(augmentation):
-    def __init__(self, variance, axis, distrobution = np.random.normal):
-        super().__init__('strech', distrobution, variance)
+    def __init__(self, variance, axis, distribution = np.random.normal):
+        super().__init__('strech', distribution, variance)
         self.axis = int(axis)
 
     def augment(self, image_tensor):
         pass
 
 class scale(augmentation):
-    def __init__(self, variance, distrobution = np.random.normal):
-        super().__init__('scale', distrobution, variance)
+    def __init__(self, variance, distribution = np.random.normal):
+        super().__init__('scale', distribution, variance)
 
     def augment(self, image):
         pass
     
 class translate(augmentation):
-    def __init__(self, variance, axis, distrobution = np.random.normal):
-        super().__init__('translate', distrobution, variance)
+    def __init__(self, variance, axis, distribution = np.random.normal):
+        super().__init__('translate', distribution, variance)
         self.axis = int(axis)
 
     def augment(self, image):
         pass
     
 class blur(augmentation):
-    def __init__(self, variance, distrobution = np.random.normal):
-        super().__init__('blur', distrobution, variance)
+    def __init__(self, variance, distribution = np.random.normal):
+        super().__init__('blur', distribution, variance)
 
     def augment(self, image):
         pass
 
 class contrast_shift(augmentation):
-    def __init__(self, variance, distrobution = np.random.normal):
-        super().__init__('contrast_shift', distrobution, variance)
+    def __init__(self, variance, distribution = np.random.normal):
+        super().__init__('contrast_shift', distribution, variance)
 
     def augment(self, image):
-        if self.distrobution == np.random.normal:
-            lower = 1.0 - np.abs(self.distrobution(0, self.variance))
-            upper = 1.0 + np.abs(self.distrobution(0, self.variance))
+        if self.distribution == np.random.normal:
+            lower = 1.0 - np.abs(self.distribution(0, self.variance))
+            upper = 1.0 + np.abs(self.distribution(0, self.variance))
             lower = np.clip(lower, CONTRAST_FACTOR_MIN, upper)
             upper = np.clip(upper, lower, CONTRAST_FACTOR_MAX)
-        elif self.distrobution == np.random.uniform:
+        elif self.distribution == np.random.uniform:
             lower = 1.0 -  self.variance
             lower = np.clip(lower, CONTRAST_FACTOR_MIN, CONTRAST_FACTOR_MAX)
             upper = 1.0 + self.variance
             upper = np.clip(upper, CONTRAST_FACTOR_MIN, CONTRAST_FACTOR_MAX)
         else:
-            raise Exception('Invalid distrobution type \"' + str(self.distrobution) + '\"')
+            raise Exception('Invalid distribution type \"' + str(self.distribution) + '\"')
 
         return tf.image.random_contrast(image, lower=lower, upper=upper)
     
 class brightness_shift(augmentation):
-    def __init__(self, variance, distrobution = np.random.normal):
-        super().__init__('brightness_shift', distrobution, variance)
+    def __init__(self, variance, distribution = np.random.normal):
+        super().__init__('brightness_shift', distribution, variance)
 
     def augment(self, image):
-        if self.distrobution == np.random.normal:
-            brightness_delta = self.distrobution(0, self.variance)
-        elif self.distrobution == np.random.uniform:
-            brightness_delta = self.distrobution(-self.variance, self.variance)
+        if self.distribution == np.random.normal:
+            brightness_delta = self.distribution(0, self.variance)
+        elif self.distribution == np.random.uniform:
+            brightness_delta = self.distribution(-self.variance, self.variance)
 
         brightness_delta = np.clip(brightness_delta, BRIGHTNESS_DELTA_MIN, BRIGHTNESS_DELTA_MAX)
         return tf.image.adjust_brightness(image, delta=brightness_delta)
     
 class sharpen(augmentation):
-    def __init__(self, variance, distrobution = np.random.normal):
-        super().__init__('sharpen', distrobution, variance)
+    def __init__(self, variance, distribution = np.random.normal):
+        super().__init__('sharpen', distribution, variance)
 
     def augment(self, image):
         pass
     
 class salt_pepper(augmentation):
-    def __init__(self, variance, distrobution = np.random.normal):
-        super().__init__('salt_pepper', distrobution, variance)
+    def __init__(self, variance, distribution = np.random.normal):
+        super().__init__('salt_pepper', distribution, variance)
 
     def augment(self, image):
-        if self.distrobution == np.random.normal:
+        if self.distribution == np.random.normal:
             noise = tf.random.normal(tf.shape(image), 0, 1)
-        elif self.distrobution == np.random.uniform:
+        elif self.distribution == np.random.uniform:
             noise = tf.random.uniform(tf.shape(image), 0, 1)
         
-        salt_noise = np.abs(self.distrobution(0, self.variance))
+        salt_noise = np.abs(self.distribution(0, self.variance))
         
         salt_noise = np.clip(salt_noise, SALT_PEPPER_FACTOR_MIN, SALT_PEPPER_FACTOR_MAX)        
         image_with_salt = tf.minimum(image + salt_noise, 1.0)
@@ -224,20 +224,20 @@ class salt_pepper(augmentation):
         return image_with_salt_and_pepper
     
 class radial_distortion(augmentation):
-    def __init__(self, variance, distrobution):
-        super().__init__("radial_distortion", distrobution, variance)
+    def __init__(self, variance, distribution):
+        super().__init__("radial_distortion", distribution, variance)
 
     def augment(self, image):
-        k1 = self.distrobution(0, self.variance)
+        k1 = self.distribution(0, self.variance)
         k1 = np.clip(k1, RADIAL_DISTORTION_FACTOR_MIN, RADIAL_DISTORTION_FACTOR_MAX)
-        k2 = self.distrobution(0, self.variance)
+        k2 = self.distribution(0, self.variance)
         k2 = np.clip(k2, RADIAL_DISTORTION_FACTOR_MIN, RADIAL_DISTORTION_FACTOR_MAX)
 
         return ctc_utils.radial_distortion(image, k1, k2)
 
 class distort(augmentation):
-    def __init__(self, variance, distrobution):
-        super().__init__("distortion", distrobution, variance)
+    def __init__(self, variance, distribution):
+        super().__init__("distortion", distribution, variance)
     
     def augment(self, image):
         pass

@@ -1,76 +1,76 @@
 [
 {
     "type": "distortion",
-    "distrobution": "gaussian",
+    "distribution": "gaussian",
     "variance": "0.001"
 },
 {
     "type": "rotation",
-    "distrobution": "gaussian",
+    "distribution": "gaussian",
     "variance": "12.0"    
 },
 {
     "type": "strech",
-    "distrobution": "gaussian",
+    "distribution": "gaussian",
     "variance": "0.2",
     "axis": "1"
 },
 {
     "type": "strech",
-    "distrobution": "gaussian",
+    "distribution": "gaussian",
     "variance": "0.2",
     "axis": "0"
 },
 {
     "type": "scale",
-    "distrobution": "gaussian",
+    "distribution": "gaussian",
     "variance": "0.3"
 },
 {
     "type": "scale",
-    "distrobution": "gaussian",
+    "distribution": "gaussian",
     "variance": "0.3"
 },
 {
     "type": "translate",
-    "distrobution": "gaussian",
+    "distribution": "gaussian",
     "variance": "0.0",
     "axis": "1"
 },
 {
     "type": "translate",
-    "distrobution": "gaussian",
+    "distribution": "gaussian",
     "variance": "0.3",
     "axis": "0"
 },
 {
     "type": "blur",
-    "distrobution": "gaussian",
+    "distribution": "gaussian",
     "variance": "0.1"
 },
 {
     "type": "contrast_shift",
-    "distrobution": "gaussian",
+    "distribution": "gaussian",
     "variance": "0.15"
 },
 {
     "type": "brightness_shift",
-    "distrobution": "gaussian",
+    "distribution": "gaussian",
     "variance": "0.15"
 },
 {
     "type": "sharpen",
-    "distrobution": "gaussian",
+    "distribution": "gaussian",
     "variance": "0.25"
 },
 {
     "type": "salt_pepper",
-    "distrobution": "uniform",
+    "distribution": "uniform",
     "variance": "0.12"
 },
 {
     "type": "radial_distortion",
-    "distrobution": "gaussian",
+    "distribution": "gaussian",
     "variance": "0.0"
 }
 ]
