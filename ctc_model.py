@@ -1,3 +1,4 @@
+import tensorflow
 import tensorflow as tf
 import os
 import logging
@@ -131,12 +132,12 @@ def load_ctc_crnn(model_path, voc_file):
 
     graph = tf.compat.v1.get_default_graph()
 
-    input = graph.get_tensor_by_name("model_input:0")
-    seq_len = graph.get_tensor_by_name("seq_lengths:0")
-    loss = graph.get_tensor_by_name("CTCLoss:0")
-    rnn_keep_prob = graph.get_tensor_by_name("keep_prob:0")
-    height_tensor = graph.get_tensor_by_name("input_height:0")
-    width_reduction_tensor = graph.get_tensor_by_name("width_reduction:0")
+    input:tensorflow.Tensor = graph.get_tensor_by_name("model_input:0")
+    seq_len:tensorflow.Tensor = graph.get_tensor_by_name("seq_lengths:0")
+    loss:tensorflow.Tensor = graph.get_tensor_by_name("CTCLoss:0")
+    rnn_keep_prob:tensorflow.Tensor = graph.get_tensor_by_name("keep_prob:0")
+    height_tensor:tensorflow.Tensor = graph.get_tensor_by_name("input_height:0")
+    width_reduction_tensor:tensorflow.Tensor = graph.get_tensor_by_name("width_reduction:0")
     logits = tf.compat.v1.get_collection("logits")[0]
 
     # Constants that are saved inside the model itself
