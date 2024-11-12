@@ -3,17 +3,19 @@ import logging
 import json
 import os
 import config
-from tensorflow import keras
 import numpy as np
+import cv2
+import PIL
+
 import tensorflow as tf
+from tensorflow import keras
 from tensorflow.keras.preprocessing.image import load_img, img_to_array
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 from tensorflow.keras.preprocessing.text import Tokenizer
+
 import ctc_utils
 import ctc_otfa
 import omr
-import cv2
-import PIL
 
 class CTCLossWrapper(tf.Module):
     def __init__(self, label_length, logit_length, blank_index=0, ):
@@ -129,26 +131,33 @@ def train(kwargs, model_params, augments=None, aug_ratio=0.0):
             logger.warning('Log file does not exist: ' + kwargs['log_file'])
     
     assert os.path.exists(os.path.dirname(kwargs['model_path'])), 'Directory does not exist: ' + os.path.dirname(kwargs['model_path'])
-    for path in [kwargs['corpus_path'], kwargs['voc_path']]: assert os.path.exists(path), 'File does not exist: ' + path
+    for path in [kwargs['corpus_path'], kwargs['voc_path']]:
+        assert os.path.exists(path), 'File does not exist: ' + path
 
-    
-    # Set up the dataset
+    # Set up the datasets (training/validation sets, testing set)
     if os.path.exists(kwargs['training_dataset_path']):
         logger.info('Loading dataset from ' + kwargs['training_dataset_path'])
-        # Load the training set 
         train_set = tf.data.Dataset.load(kwargs['training_dataset_path'])
     else:
         assert kwargs['training_dataset_path'] != kwargs['testing_dataset_path'], 'Training and testing datasets cannot be the same.'
         for path in [kwargs['training_dataset_path'], kwargs['testing_dataset_path']]: assert not os.path.exists(path), 'File already exists: ' + path
         for path in [kwargs['training_dataset_path'], kwargs['testing_dataset_path']]: assert os.path.exists(os.path.dirname(path)), 'Directory does not exist: ' + os.path.dirname(path)
 
+        # read the label set
         with open (kwargs['voc_path'], 'r') as voc_file:
             voc = voc_file.read().splitlines()
         voc = [' '] + voc # Add the blank label
 
         logger.info('Creating new datasets.')
         img_shape = (int(model_params['img_height']), int(model_params['img_width']))
-        train_set, val_set = create_datasets(kwargs['corpus_path'], int(model_params['batch_size']), padded_length=int(model_params['padded_length']), val_split=int(kwargs['split']), img_shape=img_shape, augments=augments, aug_ratio=aug_ratio, vocabulary=voc)
+        train_set, val_set = create_datasets(corpus_path=['corpus_path'],
+                                             batch_size=(model_params['batch_size']),
+                                             padded_length=int(model_params['padded_length']),
+                                             val_split=int(kwargs['split']),
+                                             img_shape=img_shape,
+                                             augments=augments,
+                                             aug_ratio=aug_ratio,
+                                             vocabulary=voc)
         
         for image_batch, labels_batch in train_set.take(int(kwargs['sample_data'])):
             logging.debug("Labels: ", labels_batch.numpy())
@@ -163,30 +172,32 @@ def train(kwargs, model_params, augments=None, aug_ratio=0.0):
         logger.info('Datasets saved to ' + kwargs['training_dataset_path'] + ' and ' + kwargs['testing_dataset_path']) 
     
     # Set up the model
-    if os.path.exists(kwargs['model_path']):      #Load the model 
+    if os.path.exists(kwargs['model_path']):
         logger.info('Loading model from ' + kwargs['model_path'])
-         # TODO: model loading
+         # TODO: model loading (checkpointing)
         raise Exception('Model loading not implemented yet.')
-    else:                                       #Create a new model
+    else:
         logger.info('Creating new model.')
         #model = omr.OMR_model(kwargs, model_params)
         model = keras.model
 
     my_callbacks = [
-    keras.callbacks.ModelCheckpoint(filepath=kwargs['checkpoint_path'], save_weights_only=False, verbose=1, save_best_only=True, monitor='val_loss', mode='min', save_freq='epoch'),
-    keras.callbacks.TensorBoard(log_dir='./logs'),
+        keras.callbacks.ModelCheckpoint(filepath=kwargs['checkpoint_path'], save_weights_only=False, verbose=1,
+                                        save_best_only=True, monitor='val_loss', mode='min', save_freq='epoch'),
+        keras.callbacks.TensorBoard(log_dir='./logs'),
     ]
     
-    ctc_loss_wrapper = CTCLossWrapper(int(model.model_params['padded_length']), int(model.model_params['vocabulary_size']), blank_index=0)
+    ctc_loss_wrapper = CTCLossWrapper(int(model.model_params['padded_length']),
+                                      int(model.model_params['vocabulary_size']),
+                                      blank_index=0)
 
-    # print the model summary
-    ctc = lambda labels, logits: tf.py_function(ctc_utils.tf.nn.ctc_loss, [labels, logits, int(model.model_params['padded_length']), int(model.model_params['vocabulary_size'])], [tf.float32])
+    # ctc = lambda labels, logits: tf.py_function(func=ctc_utils.tf.nn.ctc_loss,
+    #                                             inp=[labels, logits, int(model.model_params['padded_length']), int(model.model_params['vocabulary_size'])],
+    #                                             tout=[tf.float32])
+
     model.compile(optimizer=keras.optimizers.Adam(learning_rate=0.001), loss=ctc_loss_wrapper, metrics=[])
-
-    # add some layers to the model
     model.fit(train_set, batch_size=int(model_params['batch_size']), epochs=int(model_params['max_epochs']), callbacks=my_callbacks)
-    
-   
+
     logger.info('Saving model to ' + kwargs['model_path'])
     model.save(kwargs['model_path'])
 
@@ -216,7 +227,7 @@ if __name__ == '__main__':
     out_group.add_argument('-log-file', dest='log_file', type=str, required=False, default=configured_defaults['log_path'], help='Path to the log file.')
 
     aug_group = parser.add_argument_group('Data Augmentation Parameters')
-    aug_group.add_argument('-aug-ratio', dest='aug_ratio', type=float, required=False, default=0.0, help='Ratio of distortioned images used for training.')
+    aug_group.add_argument('-aug-ratio', dest='aug_ratio', type=float, required=False, default=0.0, help='Ratio of distorted images used for training.')
     aug_group.add_argument('-sample-data', dest='sample_data', type=int, required=False, default=0, help='Number of samples to show.')
     args = parser.parse_args()
     
