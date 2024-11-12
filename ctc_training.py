@@ -91,11 +91,18 @@ def train(corpus_path, set_path, test_set, train_set, voc_path, voc_type, model_
     logging.info("Provided arguments: " + str(locals()))
 
     # Load primus
-    primus = CTC_PriMuS(corpus_path, test_set, train_set, set_path, voc_path, voc_type, val_split = 0.1, distortion_ratio = weave_distortions_ratio, use_otfa=use_otfa)
+    primus = CTC_PriMuS(corpus_dirpath=corpus_path,
+                        test_filepath=test_set,
+                        train_filepath=train_set,
+                        dictionary_path=voc_path,
+                        voc_type=voc_type,
+                        val_split=0.1,
+                        distortion_ratio=weave_distortions_ratio,
+                        use_otfa=use_otfa)
 
     if os.path.exists(model_path) and model_path.endswith('.meta'):
         logging.info('Restoring model from ' + model_path)
-        inputs, seq_len, targets, decoded, loss, rnn_keep_prob = ctc_model.load_ctc_crnn(sess, model_path, voc_path)
+        inputs, seq_len, targets, decoded, loss, rnn_keep_prob, _, _, _ = ctc_model.load_ctc_crnn(model_path, voc_path)
     else:
         # Optimize batch size to match physical gpu memory
         params = ctc_model.default_model_params(IMG_HEIGHT,primus.vocabulary_size,batch_size=BATCH_SIZE)
