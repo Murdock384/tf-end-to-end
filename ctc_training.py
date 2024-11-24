@@ -20,8 +20,11 @@ BATCH_SIZE: int = 24
 MAX_EPOCHS: int = 100
 DROPOUT: float = 0.5
 
+
 # Calculate the sample error rate (SER) of the model
-def validate(primus: CTC_PriMuS, params: dict[str, int], sess: tensorflow.InteractiveSession,
+#CHANGED tensorflow.InteractiveSession into tf.compat.v1.InteractiveSession
+#REMOVED SET FILE FROM VALIDATE() PARAMETERS
+def validate(primus: CTC_PriMuS, params: dict[str, int], sess: tf.compat.v1.InteractiveSession,
              inputs: tensorflow.Tensor, seq_len, rnn_keep_prob: float, decoded: list[tensorflow.SparseTensor]):
     validation_batch, validation_size = primus.getValidation(params)
 
@@ -68,7 +71,8 @@ def validate(primus: CTC_PriMuS, params: dict[str, int], sess: tensorflow.Intera
 
 
 # Train the model with the given parameters and save it to model_path
-def train(corpus_path: str, set_path: str, test_set: str, train_set: str, voc_path: str, voc_type: str, model_path: str,
+#Removed args.set from train()
+def train(corpus_path: str, test_set: str, train_set: str, voc_path: str, voc_type: str, model_path: str,
           validate_batches: bool = False, verbose: bool = False, weave_distortions_ratio: float = 0.0,
           use_otfa: bool = False, log_file: Optional[str] = None) -> None:
     if verbose and log_file is not None:
@@ -84,10 +88,12 @@ def train(corpus_path: str, set_path: str, test_set: str, train_set: str, voc_pa
         logging.basicConfig(level=logging.WARNING)
 
     assert os.path.exists(os.path.dirname(model_path)), 'Directory does not exist: ' + os.path.dirname(model_path)
-    for path in [corpus_path, set_path, voc_path]:
+
+    #Was [corpus_path, set_path, voc_path] now [corpus_path,voc_path]
+    for path in [corpus_path, voc_path]:
         assert os.path.exists(path), 'File does not exist: ' + path
 
-    # Set up tensorflow 
+    # Set up tensorflow
     tf.compat.v1.disable_eager_execution()
     tf_config = tf.compat.v1.ConfigProto()
     # config.gpu_options.allow_growth=True
@@ -165,8 +171,8 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Train model.')
     parser.add_argument('-corpus', dest='corpus', type=str, required=False, help='Path to the corpus.',
                         default=configured_defaults['corpus_path'])
-    parser.add_argument('-set', dest='set', type=str, required=False, help='Path to the set file.',
-                        default=configured_defaults['set_path'])
+    # parser.add_argument('-set', dest='set', type=str, required=False, help='Path to the set file.',
+    #                     default=configured_defaults['set_path'])
     parser.add_argument('-test-set', dest='test_set', type=str, required=False,
                         default=configured_defaults['test_set_path'], help='Path to the test set file.')
     parser.add_argument('-train-set', dest='train_set', type=str, required=False,
@@ -189,5 +195,8 @@ if __name__ == '__main__':
                         help='Path to the log file.')
     args = parser.parse_args()
 
-    train(args.corpus, args.set, args.test_set, args.train_set, args.voc, args.voc_type, args.save_model,
+
+    #Removed args.set from train()
+
+    train(args.corpus, args.test_set, args.train_set, args.voc, args.voc_type, args.save_model,
           args.validate_batches, args.verbose, args.weave_distortions_ratio, args.use_otfa, args.log_file)
